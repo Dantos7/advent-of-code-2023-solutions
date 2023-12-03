@@ -6,7 +6,7 @@ pub fn part_one(input: &str) -> Option<u32> {
 
     for line in input.split("\n") {
         if line.len() > 0 {
-            sum += get_line_number_one(line)?;
+            sum += get_line_number(line)?;
         }
     }
     Some(sum)
@@ -17,7 +17,7 @@ pub fn part_two(input: &str) -> Option<u32> {
 }
 
 /// Returns the number associated to the line by combining the first and last digit
-pub fn get_line_number_one(input: &str) -> Option<u32> {
+pub fn get_line_number(input: &str) -> Option<u32> {
     let mut first_digit = None;
     let mut last_digit = None;
     for c in input.chars() {
