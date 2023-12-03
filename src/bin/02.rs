@@ -59,7 +59,31 @@ fn parse_int(input: &str) -> Option<u32> {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    None
+    let mut sum=0;
+
+    for line in input.split("\n") {
+        if line.len() > 0 {
+            let Some((_, sets)) = parse_line(line) else { panic!() };
+            sum += get_game_power(sets);
+        }
+    }
+    Some(sum)
+}
+
+fn get_game_power(sets: Vec<HashMap<&str,u32>>) -> u32 {
+    let mut minimum_set = HashMap::from([
+        ("red", 0),
+        ("green", 0),
+        ("blue", 0)
+    ]);
+    for set in sets.iter() {
+        for color in ["red", "green", "blue"] {
+            if set[color] > minimum_set[color] {
+                minimum_set.insert(color, set[color]);
+            }
+        }
+    }
+    minimum_set["red"] * minimum_set["green"] * minimum_set["blue"]
 }
 
 #[cfg(test)]
@@ -75,6 +99,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(2286));
     }
 }
