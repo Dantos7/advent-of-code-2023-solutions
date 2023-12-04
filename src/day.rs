@@ -120,11 +120,7 @@ macro_rules! day {
     ($day:expr) => {{
         const _ASSERT: () = assert!(
             $day != 0 && $day <= 25,
-            concat!(
-                "invalid day number `",
-                $day,
-                "`, expecting a value between 1 and 25"
-            ),
+            concat!("invalid day number `", $day, "`, expecting a value between 1 and 25"),
         );
         $crate::Day::__new_unchecked($day)
     }};

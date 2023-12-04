@@ -12,7 +12,7 @@ pub fn part_one(input: &str) -> Option<u32> {
         for (j, c) in char_vec.iter().enumerate() {
             if c.is_digit(10) {
                 digits_run.push(*c);
-                if is_adjacent_to_symbol(i,j, &char_mat) {
+                if is_adjacent_to_symbol(i, j, &char_mat) {
                     is_number_adjacent = true;
                 }
             } else {
@@ -50,7 +50,16 @@ fn is_adjacent_to_symbol(i: usize, j: usize, mat: &Vec<Vec<char>>) -> bool {
     let max_i = (mat.len() - 1) as i32;
     let max_j = (mat[0].len() - 1) as i32;
     let mut is_adjacent = false;
-    let adjacent_cells = [(i_+1,j_), (i_+1,j_+1), (i_-1,j_), (i_-1,j_-1), (i_,j_+1), (i_,j_-1), (i_-1,j_+1), (i_+1,j_-1)];
+    let adjacent_cells = [
+        (i_ + 1, j_),
+        (i_ + 1, j_ + 1),
+        (i_ - 1, j_),
+        (i_ - 1, j_ - 1),
+        (i_, j_ + 1),
+        (i_, j_ - 1),
+        (i_ - 1, j_ + 1),
+        (i_ + 1, j_ - 1),
+    ];
     for (neighbor_i, neighbor_j) in adjacent_cells {
         if (0 <= neighbor_i && neighbor_i <= max_i) && (0 <= neighbor_j && neighbor_j <= max_j) {
             // the neighbor cell is a valid coordinate
@@ -63,7 +72,7 @@ fn is_adjacent_to_symbol(i: usize, j: usize, mat: &Vec<Vec<char>>) -> bool {
     is_adjacent
 }
 
-fn is_symbol(c:char) -> bool {
+fn is_symbol(c: char) -> bool {
     c != '.' && !c.is_digit(10)
 }
 
@@ -75,11 +84,11 @@ pub fn part_two(input: &str) -> Option<u32> {
     for (i, char_vec) in char_mat.iter().enumerate() {
         let mut digits_run = String::from("");
         let mut is_number_adjacent = false;
-        let mut number_gears_coordinates:Vec<(usize,usize)> = vec![];
+        let mut number_gears_coordinates: Vec<(usize, usize)> = vec![];
         for (j, c) in char_vec.iter().enumerate() {
             if c.is_digit(10) {
                 digits_run.push(*c);
-                let (is_adj, mut gears_coordinates) = is_adjacent_to_gear(i,j, &char_mat);
+                let (is_adj, mut gears_coordinates) = is_adjacent_to_gear(i, j, &char_mat);
                 if is_adj {
                     is_number_adjacent = true;
                     number_gears_coordinates.append(&mut gears_coordinates);
@@ -87,7 +96,7 @@ pub fn part_two(input: &str) -> Option<u32> {
             } else {
                 if is_number_adjacent {
                     // At least one digit is adjacent to a symbol (if run is empty, is_number_adjacent is false)
-                    parts_gears.insert((digits_run.parse::<u32>().unwrap(), i, j-1), number_gears_coordinates.clone());
+                    parts_gears.insert((digits_run.parse::<u32>().unwrap(), i, j - 1), number_gears_coordinates.clone());
                 }
                 digits_run = String::from("");
                 is_number_adjacent = false;
@@ -103,11 +112,11 @@ pub fn part_two(input: &str) -> Option<u32> {
     }
 
     // Rearrange parts_gears in reverse (from gears to parts) in order to be able to compute the ratios
-    let mut gears_parts:HashMap<(usize,usize), Vec<(u32, usize, usize)>> = HashMap::new();
+    let mut gears_parts: HashMap<(usize, usize), Vec<(u32, usize, usize)>> = HashMap::new();
     for (part, gears_cords) in parts_gears.iter() {
         for gear_cord in gears_cords {
             let parts = gears_parts.get(gear_cord);
-            if parts.is_none(){
+            if parts.is_none() {
                 gears_parts.insert(*gear_cord, vec![*part]);
             } else {
                 let mut new_parts = parts?.clone();
@@ -134,14 +143,23 @@ pub fn part_two(input: &str) -> Option<u32> {
     Some(sum)
 }
 
-fn is_adjacent_to_gear(i: usize, j: usize, mat: &Vec<Vec<char>>) -> (bool, Vec<(usize,usize)>) {
+fn is_adjacent_to_gear(i: usize, j: usize, mat: &Vec<Vec<char>>) -> (bool, Vec<(usize, usize)>) {
     let i_ = i as i32;
     let j_ = j as i32;
     let max_i = (mat.len() - 1) as i32;
     let max_j = (mat[0].len() - 1) as i32;
     let mut is_adjacent = false;
     let mut gears_coordinates = vec![];
-    let adjacent_cells = [(i_+1,j_), (i_+1,j_+1), (i_-1,j_), (i_-1,j_-1), (i_,j_+1), (i_,j_-1), (i_-1,j_+1), (i_+1,j_-1)];
+    let adjacent_cells = [
+        (i_ + 1, j_),
+        (i_ + 1, j_ + 1),
+        (i_ - 1, j_),
+        (i_ - 1, j_ - 1),
+        (i_, j_ + 1),
+        (i_, j_ - 1),
+        (i_ - 1, j_ + 1),
+        (i_ + 1, j_ - 1),
+    ];
     for (neighbor_i, neighbor_j) in adjacent_cells {
         if (0 <= neighbor_i && neighbor_i <= max_i) && (0 <= neighbor_j && neighbor_j <= max_j) {
             // the neighbor cell is a valid coordinate
@@ -154,8 +172,9 @@ fn is_adjacent_to_gear(i: usize, j: usize, mat: &Vec<Vec<char>>) -> (bool, Vec<(
     (is_adjacent, gears_coordinates)
 }
 
-fn is_gear(c:char) -> bool { c == '*' }
-
+fn is_gear(c: char) -> bool {
+    c == '*'
+}
 
 #[cfg(test)]
 mod tests {

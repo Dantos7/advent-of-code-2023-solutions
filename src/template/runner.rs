@@ -12,8 +12,7 @@ use super::ANSI_BOLD;
 pub fn run_part<I: Clone, T: Display>(func: impl Fn(I) -> Option<T>, input: I, day: Day, part: u8) {
     let part_str = format!("Part {part}");
 
-    let (result, duration, samples) =
-        run_timed(func, input, |result| print_result(result, &part_str, ""));
+    let (result, duration, samples) = run_timed(func, input, |result| print_result(result, &part_str, ""));
 
     print_result(&result, &part_str, &format_duration(&duration, samples));
 
@@ -25,11 +24,7 @@ pub fn run_part<I: Clone, T: Display>(func: impl Fn(I) -> Option<T>, input: I, d
 /// Run a solution part. The behavior differs depending on whether we are running a release or debug build:
 ///  1. in debug, the function is executed once.
 ///  2. in release, the function is benched (approx. 1 second of execution time or 10 samples, whatever take longer.)
-fn run_timed<I: Clone, T>(
-    func: impl Fn(I) -> T,
-    input: I,
-    hook: impl Fn(&T),
-) -> (T, Duration, u128) {
+fn run_timed<I: Clone, T>(func: impl Fn(I) -> T, input: I, hook: impl Fn(&T)) -> (T, Duration, u128) {
     let timer = Instant::now();
     let result = func(input.clone());
     let base_time = timer.elapsed();
@@ -53,10 +48,7 @@ fn bench<I: Clone, T>(func: impl Fn(I) -> T, input: I, base_time: &Duration) -> 
 
     let bench_iterations = cmp::min(
         10000,
-        cmp::max(
-            Duration::from_secs(1).as_nanos() / cmp::max(base_time.as_nanos(), 10),
-            10,
-        ),
+        cmp::max(Duration::from_secs(1).as_nanos() / cmp::max(base_time.as_nanos(), 10), 10),
     );
 
     let mut timers: Vec<Duration> = vec![];
@@ -77,11 +69,7 @@ fn bench<I: Clone, T>(func: impl Fn(I) -> T, input: I, base_time: &Duration) -> 
 }
 
 fn average_duration(numbers: &[Duration]) -> u128 {
-    numbers
-        .iter()
-        .map(std::time::Duration::as_nanos)
-        .sum::<u128>()
-        / numbers.len() as u128
+    numbers.iter().map(std::time::Duration::as_nanos).sum::<u128>() / numbers.len() as u128
 }
 
 fn format_duration(duration: &Duration, samples: u128) -> String {
@@ -130,11 +118,7 @@ fn print_result<T: Display>(result: &Option<T>, part: &str, duration_str: &str) 
 /// Parse the arguments passed to `solve` and try to submit one part of the solution if:
 ///  1. we are in `--release` mode.
 ///  2. aoc-cli is installed.
-fn submit_result<T: Display>(
-    result: T,
-    day: Day,
-    part: u8,
-) -> Option<Result<Output, aoc_cli::AocCommandError>> {
+fn submit_result<T: Display>(result: T, day: Day, part: u8) -> Option<Result<Output, aoc_cli::AocCommandError>> {
     let args: Vec<String> = env::args().collect();
 
     if !args.contains(&"--submit".into()) {

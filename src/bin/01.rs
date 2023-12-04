@@ -2,7 +2,7 @@ advent_of_code::solution!(1);
 
 /// Solver for part one of the current day
 pub fn part_one(input: &str) -> Option<u32> {
-    let mut sum=0;
+    let mut sum = 0;
 
     for line in input.split("\n") {
         if line.len() > 0 {
@@ -13,7 +13,7 @@ pub fn part_one(input: &str) -> Option<u32> {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    let mut sum=0;
+    let mut sum = 0;
 
     for line in input.split("\n") {
         if line.len() > 0 {
@@ -39,7 +39,6 @@ pub fn get_line_number_numeric(input: &str) -> Option<u32> {
     number
 }
 
-
 /// Returns the number associated to the line by combining the first and last digit
 /// In this second version, numbers can also be spelled in letters
 /// ! Replacing spelled digits with actual digits does not work in cases where names are concatenated (e.g. twone)
@@ -50,7 +49,7 @@ pub fn get_line_number_alphanumeric(input: &str) -> Option<u32> {
     number
 }
 
-fn get_first_alphanumeric_digit(input: &str) -> Option<String>{
+fn get_first_alphanumeric_digit(input: &str) -> Option<String> {
     let mut first_digit = None;
     let mut spelled_number_run = "".to_owned();
     for c in input.chars() {
@@ -61,9 +60,8 @@ fn get_first_alphanumeric_digit(input: &str) -> Option<String>{
                 first_digit = Some(c.to_string());
                 break;
             }
-        }
-        else {
-            if let Some(d) = get_spelled_digit_forward(&spelled_number_run){
+        } else {
+            if let Some(d) = get_spelled_digit_forward(&spelled_number_run) {
                 spelled_number_run = String::from("");
                 if first_digit.is_none() {
                     first_digit = Some(d.clone());
@@ -75,7 +73,7 @@ fn get_first_alphanumeric_digit(input: &str) -> Option<String>{
     first_digit
 }
 
-fn get_spelled_digit_forward(input:&str) -> Option<String> {
+fn get_spelled_digit_forward(input: &str) -> Option<String> {
     let digit;
     let mut found_spelled_digit = None;
     let vocabulary_spelled_digits = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
@@ -99,13 +97,13 @@ fn get_spelled_digit_forward(input:&str) -> Option<String> {
             "seven" => Some(String::from("7")),
             "eight" => Some(String::from("8")),
             "nine" => Some(String::from("9")),
-            _ => None
+            _ => None,
         };
     }
     digit
 }
 
-fn get_last_alphanumeric_digit(input: &str) -> Option<String>{
+fn get_last_alphanumeric_digit(input: &str) -> Option<String> {
     // Since we are now searching backwards, the search can halt at the first found digit
     let new_input = input.chars().rev().collect::<String>();
     let mut last_digit = None;
@@ -118,9 +116,8 @@ fn get_last_alphanumeric_digit(input: &str) -> Option<String>{
                 last_digit = Some(c.to_string());
                 break;
             }
-        }
-        else {
-            if let Some(d) = get_spelled_digit_backwards(&spelled_number_run){
+        } else {
+            if let Some(d) = get_spelled_digit_backwards(&spelled_number_run) {
                 spelled_number_run = String::from("");
                 if last_digit.is_none() {
                     last_digit = Some(d.clone());
@@ -132,7 +129,7 @@ fn get_last_alphanumeric_digit(input: &str) -> Option<String>{
     last_digit
 }
 
-fn get_spelled_digit_backwards(input:&str) -> Option<String> {
+fn get_spelled_digit_backwards(input: &str) -> Option<String> {
     let digit;
     let mut found_spelled_digit = None;
     let vocabulary_spelled_digits_backwards = ["eno", "owt", "eerht", "ruof", "evif", "xis", "neves", "thgie", "enin"];
@@ -156,12 +153,11 @@ fn get_spelled_digit_backwards(input:&str) -> Option<String> {
             "neves" => Some(String::from("7")),
             "thgie" => Some(String::from("8")),
             "enin" => Some(String::from("9")),
-            _ => None
+            _ => None,
         };
     }
     digit
 }
-
 
 #[cfg(test)]
 mod tests {

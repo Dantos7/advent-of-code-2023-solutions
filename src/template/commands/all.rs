@@ -167,14 +167,7 @@ mod child_commands {
 
     fn parse_time(line: &str) -> Option<(&str, f64)> {
         // for possible time formats, see: https://github.com/rust-lang/rust/blob/1.64.0/library/core/src/time.rs#L1176-L1200
-        let str_timing = line
-            .split(" samples)")
-            .next()?
-            .split('(')
-            .last()?
-            .split('@')
-            .next()?
-            .trim();
+        let str_timing = line.split(" samples)").next()?.split('(').last()?.split('@').next()?.trim();
 
         let parsed_timing = match str_timing {
             s if s.contains("ns") => s.split("ns").next()?.parse::<f64>().ok(),
@@ -191,12 +184,7 @@ mod child_commands {
     macro_rules! assert_approx_eq {
         ($a:expr, $b:expr) => {{
             let (a, b) = (&$a, &$b);
-            assert!(
-                (*a - *b).abs() < 1.0e-6,
-                "{} is not approximately equal to {}",
-                *a,
-                *b
-            );
+            assert!((*a - *b).abs() < 1.0e-6, "{} is not approximately equal to {}", *a, *b);
         }};
     }
 
@@ -238,14 +226,7 @@ mod child_commands {
 
         #[test]
         fn test_missing_parts() {
-            let res = parse_exec_time(
-                &[
-                    "Part 1: ✖        ".into(),
-                    "Part 2: ✖        ".into(),
-                    "".into(),
-                ],
-                day!(1),
-            );
+            let res = parse_exec_time(&["Part 1: ✖        ".into(), "Part 2: ✖        ".into(), "".into()], day!(1));
             assert_approx_eq!(res.total_nanos, 0_f64);
             assert_eq!(res.part_1.is_none(), true);
             assert_eq!(res.part_2.is_none(), true);

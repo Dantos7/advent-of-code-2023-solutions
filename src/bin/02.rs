@@ -1,13 +1,13 @@
-use std::collections::HashMap;
 use qndr::get_numbers;
+use std::collections::HashMap;
 
 advent_of_code::solution!(2);
 
 pub fn part_one(input: &str) -> Option<u32> {
-    let mut sum=0;
-    const RED:u32 = 12;
-    const GREEN:u32 = 13;
-    const BLUE:u32 = 14;
+    let mut sum = 0;
+    const RED: u32 = 12;
+    const GREEN: u32 = 13;
+    const BLUE: u32 = 14;
 
     for line in input.split("\n") {
         if line.len() > 0 {
@@ -20,18 +20,14 @@ pub fn part_one(input: &str) -> Option<u32> {
     Some(sum)
 }
 
-fn parse_line(line: &str) -> Option<(u32, Vec<HashMap<&str,u32>>)>{
-    let mut sets:Vec<HashMap<&str,u32>> = vec![];
+fn parse_line(line: &str) -> Option<(u32, Vec<HashMap<&str, u32>>)> {
+    let mut sets: Vec<HashMap<&str, u32>> = vec![];
     let mut line_split_1 = line.split(":");
     let game_id = parse_int(line_split_1.nth(0)?)?; // ! nth() consumes the iterator
     for set_split in line_split_1.nth(0)?.split(";") {
-        let mut set = HashMap::from([
-            ("red", 0),
-            ("green", 0),
-            ("blue", 0)
-        ]);
+        let mut set = HashMap::from([("red", 0), ("green", 0), ("blue", 0)]);
         for color_split in set_split.split(",") {
-            for (color, _) in set.clone().into_iter(){
+            for (color, _) in set.clone().into_iter() {
                 if color_split.contains(color) {
                     set.insert(color, parse_int(color_split)?);
                 }
@@ -42,16 +38,14 @@ fn parse_line(line: &str) -> Option<(u32, Vec<HashMap<&str,u32>>)>{
     Some((game_id, sets))
 }
 
-
-fn is_game_valid(sets:Vec<HashMap<&str,u32>>, red:u32, green:u32, blue:u32) -> bool {
-    for set in sets.into_iter(){
-        if set["red"] > red || set["green"] > green ||  set["blue"] > blue {
-            return false
+fn is_game_valid(sets: Vec<HashMap<&str, u32>>, red: u32, green: u32, blue: u32) -> bool {
+    for set in sets.into_iter() {
+        if set["red"] > red || set["green"] > green || set["blue"] > blue {
+            return false;
         }
     }
     true
 }
-
 
 /// Parse int, ignoring other non-numeric chars in the string
 fn parse_int(input: &str) -> Option<u32> {
@@ -59,7 +53,7 @@ fn parse_int(input: &str) -> Option<u32> {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    let mut sum=0;
+    let mut sum = 0;
 
     for line in input.split("\n") {
         if line.len() > 0 {
@@ -70,12 +64,8 @@ pub fn part_two(input: &str) -> Option<u32> {
     Some(sum)
 }
 
-fn get_game_power(sets: Vec<HashMap<&str,u32>>) -> u32 {
-    let mut minimum_set = HashMap::from([
-        ("red", 0),
-        ("green", 0),
-        ("blue", 0)
-    ]);
+fn get_game_power(sets: Vec<HashMap<&str, u32>>) -> u32 {
+    let mut minimum_set = HashMap::from([("red", 0), ("green", 0), ("blue", 0)]);
     for set in sets.iter() {
         for color in ["red", "green", "blue"] {
             if set[color] > minimum_set[color] {
