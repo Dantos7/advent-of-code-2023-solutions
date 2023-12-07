@@ -1,33 +1,28 @@
-use std::collections::HashMap;
-use tqdm::tqdm;
 advent_of_code::solution!(5);
 
-pub fn part_one(input: &str) -> Option<u32> {
+pub fn part_one(input: &str) -> Option<u64> {
     let mut read_ranges = false;
-    let mut keys: Vec<u32> = vec![];
-    let mut hash_map: HashMap<u32, u32> = HashMap::new();
+    let mut keys: Vec<u64> = vec![];
+    let mut ranges: Vec<(u64, u64, u64)> = vec![];
     for line in input.split("\n") {
         if line.len() > 1 {
             if line.starts_with("seeds: ") {
                 let line_split = line.strip_prefix("seeds: ").unwrap().split_whitespace();
-                keys = line_split.map(|s| s.parse::<u32>().unwrap()).collect();
+                keys = line_split.map(|s| s.parse::<u64>().unwrap()).collect();
             } else if line.contains("map:") {
                 read_ranges = true
             } else if read_ranges {
-                let (destination_range_start, source_range_start, range_length) = parse_ranged_list(line);
-                populate_hash_map(&mut hash_map, destination_range_start, source_range_start, range_length);
+                let range = parse_ranged_list(line);
+                ranges.push(range);
             }
         } else {
-            if read_ranges {
+            if ranges.len() > 0 {
                 let mut new_keys = keys.clone();
                 for (i, k) in keys.iter().enumerate() {
-                    new_keys[i] = match hash_map.get(k) {
-                        Some(new_k) => *new_k,
-                        None => *k,
-                    };
+                    new_keys[i] = get_new_key(&ranges, *k);
                 }
-                keys = new_keys;
-                hash_map = HashMap::new();
+                keys = new_keys.clone();
+                ranges = vec![];
                 read_ranges = false;
             }
         }
@@ -36,21 +31,27 @@ pub fn part_one(input: &str) -> Option<u32> {
     Some(min)
 }
 
-fn parse_ranged_list(line: &str) -> (u32, u32, u32) {
+fn parse_ranged_list(line: &str) -> (u64, u64, u64) {
     let mut split = line.split_whitespace();
-    let destination_range_start = split.nth(0).unwrap().parse::<u32>().unwrap();
-    let source_range_start = split.nth(0).unwrap().parse::<u32>().unwrap();
-    let range_length = split.nth(0).unwrap().parse::<u32>().unwrap();
+    let destination_range_start = split.nth(0).unwrap().parse::<u64>().unwrap();
+    let source_range_start = split.nth(0).unwrap().parse::<u64>().unwrap();
+    let range_length = split.nth(0).unwrap().parse::<u64>().unwrap();
     (destination_range_start, source_range_start, range_length)
 }
 
-fn populate_hash_map(hash_map: &mut HashMap<u32, u32>, destination_range_start: u32, source_range_start: u32, range_length: u32) {
-    for i in tqdm(0..(range_length)) {
-        hash_map.insert(source_range_start + i, destination_range_start + i);
+fn get_new_key(ranges: &Vec<(u64, u64, u64)>, key: u64) -> u64 {
+    // use the same key if not found in range
+    let mut new_key = key;
+    for (destination_range_start, source_range_start, range_length) in ranges {
+        if key > *source_range_start && key < (*source_range_start + *range_length) {
+            new_key = key - source_range_start + destination_range_start;
+            break;
+        }
     }
+    new_key
 }
 
-pub fn part_two(input: &str) -> Option<u32> {
+pub fn part_two(input: &str) -> Option<u64> {
     None
 }
 
