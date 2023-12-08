@@ -2,7 +2,7 @@ use std::collections::HashMap;
 advent_of_code::solution!(8);
 
 pub fn part_one(input: &str) -> Option<u32> {
-    let mut input_split = input.split("\r\n"); // Use \r\n to split file with CRLF line ending
+    let mut input_split = input.split("\n"); // Be careful to have input/example files with LF line ending
     let directions = input_split.nth(0).unwrap().chars();
     let mut nodes_edges: HashMap<&str, (&str, &str)> = HashMap::new();
     let mut steps = 0;
