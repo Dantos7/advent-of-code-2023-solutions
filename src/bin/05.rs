@@ -53,13 +53,13 @@ fn get_new_key(ranges: &Vec<(u64, u64, u64)>, key: u64) -> u64 {
 
 pub fn part_two(input: &str) -> Option<u64> {
     let mut read_ranges = false;
-    let mut ranged_keys: Vec<(u64,u64)> = vec![];
+    let mut ranged_keys: Vec<(u64, u64)> = vec![];
     let mut ranges: Vec<(u64, u64, u64)> = vec![];
     for line in input.split("\n") {
         if line.len() > 1 {
             if line.starts_with("seeds: ") {
                 let line_split = line.strip_prefix("seeds: ").unwrap().split_whitespace();
-                let mut ranged_key:(u64,u64) = (0,0);
+                let mut ranged_key: (u64, u64) = (0, 0);
                 let mut counter = 0;
                 for val in line_split.map(|s| s.parse::<u64>().unwrap()) {
                     if counter == 0 {
@@ -68,7 +68,7 @@ pub fn part_two(input: &str) -> Option<u64> {
                     } else {
                         ranged_key.1 = val;
                         ranged_keys.push(ranged_key);
-                        ranged_key = (0,0);
+                        ranged_key = (0, 0);
                         counter = 0;
                     }
                 }
@@ -95,9 +95,9 @@ pub fn part_two(input: &str) -> Option<u64> {
     Some(min)
 }
 
-fn get_new_ranged_keys(ranges: &Vec<(u64, u64, u64)>, ranged_key: (u64,u64)) -> Vec<(u64,u64)> {
+fn get_new_ranged_keys(ranges: &Vec<(u64, u64, u64)>, ranged_key: (u64, u64)) -> Vec<(u64, u64)> {
     // TODO (need to produce new ranges based on how the ranged key intersects each range)
-    vec![(0,0)]
+    vec![(0, 0)]
 }
 
 #[cfg(test)]
