@@ -97,7 +97,6 @@ fn is_four_of_a_kind(hand_chars: &mut Vec<char>, joker: bool) -> bool {
     false
 }
 
-// TODO wrong
 fn is_full_house(hand_chars: &mut Vec<char>, joker: bool) -> bool {
     let mut cards_counts = hand_chars.iter().map(|x| *x).collect::<Counter<char>>();
     let mut triple_found = false;
