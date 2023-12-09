@@ -59,12 +59,12 @@ pub fn part_two(input: &str) -> Option<u128> {
         .map(|p| String::from(p))
         .filter(|s| s.ends_with("A"))
         .collect::<Vec<String>>();
-    let current_positions:Vec<&str> = current_positions_string.iter().map(|s| &**s).collect();
-    let mut steps_starting_positions:Vec<u128> = vec![];
+    let current_positions: Vec<&str> = current_positions_string.iter().map(|s| &**s).collect();
+    let mut steps_starting_positions: Vec<u128> = vec![];
     let mut directions_mut = directions.clone();
     for cp in current_positions {
         let mut current_position = cp;
-        let mut steps:u128 = 0;
+        let mut steps: u128 = 0;
         while current_position.chars().last().unwrap() != 'Z' {
             let direction_opt = directions_mut.nth(0);
             let direction;
@@ -83,8 +83,8 @@ pub fn part_two(input: &str) -> Option<u128> {
         }
         steps_starting_positions.push(steps);
     }
-    let mut array_steps:[u128;6] = [0,0,0,0,0,0];
-    for (i,s) in steps_starting_positions.iter().enumerate() {
+    let mut array_steps: [u128; 6] = [0, 0, 0, 0, 0, 0];
+    for (i, s) in steps_starting_positions.iter().enumerate() {
         array_steps[i] = *s;
     }
     Some(lcm(&array_steps))
@@ -113,15 +113,15 @@ mod tests {
 
     #[test]
     fn test_part_one() {
-//        let result = part_one(&advent_of_code::template::read_file("examples", DAY));
-//        assert_eq!(result, Some(6));
+        //        let result = part_one(&advent_of_code::template::read_file("examples", DAY));
+        //        assert_eq!(result, Some(6));
         assert_eq!(true, true); // Skipping test in the commit to avoid failing build (examples are different and incompatible between parts)
     }
 
     #[test]
     fn test_part_two() {
-//        let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-//        assert_eq!(result, Some(6));
+        //        let result = part_two(&advent_of_code::template::read_file("examples", DAY));
+        //        assert_eq!(result, Some(6));
         assert_eq!(true, true); // Skipping test in the commit to avoid failing build (examples are different and incompatible between parts)
     }
 }
