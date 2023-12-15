@@ -81,7 +81,7 @@ pub fn part_two(input: &str) -> Option<u64> {
         } else {
             if ranges.len() > 0 {
                 let mut new_ranged_keys = vec![];
-                for (i, k) in ranged_keys.iter().enumerate() {
+                for k in ranged_keys.iter() {
                     new_ranged_keys.append(&mut get_new_ranged_keys(&ranges, *k));
                 }
                 ranged_keys = new_ranged_keys.clone();
@@ -90,34 +90,80 @@ pub fn part_two(input: &str) -> Option<u64> {
             }
         }
     }
-    // let min = *keys.iter().min().unwrap();
-    // let min = 0;
-    // Some(min)
-    None
+    // determine minimum final number in the ranged_keys
+    let mut min = None;
+    for (start, _) in ranged_keys {
+        if min.is_none() {
+            min = Some(start);
+        } else if min.unwrap() > start {
+            min = Some(start);
+        }
+    }
+    min
 }
 
 fn get_new_ranged_keys(ranges: &Vec<(u64, u64, u64)>, ranged_key: (u64, u64)) -> Vec<(u64, u64)> {
     // use the same key if not found in range
     let mut new_ranged_keys = vec![];
-    for (destination_range_start, source_range_start, range_length) in ranges {
+    let ranged_key_start = ranged_key.0;
+    let ranged_key_range = ranged_key.1;
+    let ranged_key_end = ranged_key_start + ranged_key_range - 1;
+    for (destination_range_start_ref, source_range_start_ref, range_length_ref) in ranges {
         // Check range intersection (rk = ranged_key, r = range)
-        // - rk doesn't intersect r -> return rk
-        // - rk is completely contained in r -> return mapped_rk
-        // - r is completely contained in rk -> return right-reduced rk, mapped_r, left-reduced rk (where reduction is based on what part of rk is not contained in r)
-        // - rk intersect partially r (intersection is on the right side of rk) -> return right-reduced rk, mapped_intersection
-        // - rk intersect partially r (intersection is on the left side of rk) -> return  mapped_intersection, left-reduced rk
+        // 1. rk doesn't intersect r -> continue (if no range intersects the key, return the exact range)
+        // 2. rk is completely contained in r -> return mapped_rk
+        // 3. r is completely contained in rk -> return mapped_r, call get_new_ranged_keys on the two separate intersections
+        // 4. rk intersect partially r (intersection is on the right side of rk) -> call get_new_ranged_keys on the intersection + return mapped_intersection
+        // 5. rk intersect partially r (intersection is on the left side of rk) -> call get_new_ranged_keys on the intersection + return mapped_intersection
 
         // the function returns a minimum of 1 and a maximum of 3 ranged keys
 
-        // TODO write function to calculate the intersection
-
-        // Check if key is in range
-        /*        if key > *source_range_start && key < (*source_range_start + *range_length) {
-            new_key = key - source_range_start + destination_range_start;
-            break;
-        }*/
+        let source_range_start = *source_range_start_ref;
+        let range_length = *range_length_ref;
+        let source_range_end = source_range_start + range_length - 1;
+        let destination_range_start = *destination_range_start_ref;
+        let destination_range_end = destination_range_start + range_length - 1;
+        // Calculate the intersection in each case
+        if (ranged_key_start >= source_range_start) && (ranged_key_end <= source_range_end) {
+            // 2. rk is completely contained in r
+            let mapped_ranged_key_start = ranged_key_start - source_range_start + destination_range_start;
+            new_ranged_keys.push((mapped_ranged_key_start, ranged_key_range));
+            return new_ranged_keys;
+        } else if (ranged_key_start < source_range_start) && (ranged_key_end > source_range_end) {
+            // 3. r is completely contained in rk
+            new_ranged_keys.push((destination_range_start, range_length));
+            new_ranged_keys.append(&mut get_new_ranged_keys(
+                ranges,
+                (source_range_end, ranged_key_end - source_range_end),
+            )); // right-difference
+            new_ranged_keys.append(&mut get_new_ranged_keys(
+                ranges,
+                (ranged_key_start, source_range_start - ranged_key_start),
+            )); // left difference
+            return new_ranged_keys;
+        } else if (ranged_key_start < source_range_start) && (ranged_key_end < source_range_end) && (ranged_key_end > source_range_start) {
+            // 4. rk intersect partially r (intersection is on the right side of rk)
+            let mapped_ranged_key_end = ranged_key_end - source_range_start + destination_range_start;
+            new_ranged_keys.push((destination_range_start, mapped_ranged_key_end - destination_range_start));
+            new_ranged_keys.append(&mut get_new_ranged_keys(
+                ranges,
+                (ranged_key_start, source_range_start - ranged_key_start),
+            ));
+            return new_ranged_keys;
+        } else if (ranged_key_start > source_range_start) && (ranged_key_start < source_range_end) && (ranged_key_end > source_range_end) {
+            // 5. rk intersect partially r (intersection is on the left side of rk)
+            let mapped_ranged_key_start = ranged_key_start - source_range_start + destination_range_start;
+            new_ranged_keys.push((mapped_ranged_key_start, destination_range_end - mapped_ranged_key_start));
+            new_ranged_keys.append(&mut get_new_ranged_keys(
+                ranges,
+                (source_range_end, ranged_key_end - source_range_end),
+            ));
+            return new_ranged_keys;
+        } else {
+            // No intersection
+        }
     }
-    new_ranged_keys
+    vec![(ranged_key_start, ranged_key_range)]
 }
 
 #[cfg(test)]
@@ -133,6 +179,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(46));
     }
 }
