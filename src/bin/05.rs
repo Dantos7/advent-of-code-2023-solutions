@@ -80,7 +80,7 @@ pub fn part_two(input: &str) -> Option<u64> {
             }
         } else {
             if ranges.len() > 0 {
-                let mut new_ranged_keys = ranged_keys.clone();
+                let mut new_ranged_keys = vec![];
                 for (i, k) in ranged_keys.iter().enumerate() {
                     new_ranged_keys.append(&mut get_new_ranged_keys(&ranges, *k));
                 }
@@ -97,8 +97,27 @@ pub fn part_two(input: &str) -> Option<u64> {
 }
 
 fn get_new_ranged_keys(ranges: &Vec<(u64, u64, u64)>, ranged_key: (u64, u64)) -> Vec<(u64, u64)> {
-    // TODO (need to produce new ranges based on how the ranged key intersects each range)
-    vec![(0, 0)]
+    // use the same key if not found in range
+    let mut new_ranged_keys = vec![];
+    for (destination_range_start, source_range_start, range_length) in ranges {
+        // Check range intersection (rk = ranged_key, r = range)
+        // - rk doesn't intersect r -> return rk
+        // - rk is completely contained in r -> return mapped_rk
+        // - r is completely contained in rk -> return right-reduced rk, mapped_r, left-reduced rk (where reduction is based on what part of rk is not contained in r)
+        // - rk intersect partially r (intersection is on the right side of rk) -> return right-reduced rk, mapped_intersection
+        // - rk intersect partially r (intersection is on the left side of rk) -> return  mapped_intersection, left-reduced rk
+
+        // the function returns a minimum of 1 and a maximum of 3 ranged keys
+
+        // TODO write function to calculate the intersection
+
+        // Check if key is in range
+        /*        if key > *source_range_start && key < (*source_range_start + *range_length) {
+            new_key = key - source_range_start + destination_range_start;
+            break;
+        }*/
+    }
+    new_ranged_keys
 }
 
 #[cfg(test)]
