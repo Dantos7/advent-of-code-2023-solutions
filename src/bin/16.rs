@@ -1,3 +1,4 @@
+use tqdm::tqdm;
 advent_of_code::solution!(16);
 
 pub fn part_one(input: &str) -> Option<usize> {
@@ -15,18 +16,18 @@ pub fn part_one(input: &str) -> Option<usize> {
             energized_tiles.push(coords);
         }
     }
-
-    for (i, row) in char_mat.iter().enumerate() {
-        for (j, _) in row.iter().enumerate() {
-            if energized_tiles.contains(&(i, j)) {
-                print!("#");
-            } else {
-                print!(".")
+    /*
+        for (i, row) in char_mat.iter().enumerate() {
+            for (j, _) in row.iter().enumerate() {
+                if energized_tiles.contains(&(i, j)) {
+                    print!("#");
+                } else {
+                    print!(".")
+                }
             }
+            println!();
         }
-        println!();
-    }
-
+    */
     Some(energized_tiles.len())
 }
 
@@ -161,8 +162,44 @@ fn get_going_directions(c: char, going_direction: &str) -> Vec<&str> {
     }
 }
 
-pub fn part_two(input: &str) -> Option<u32> {
-    None
+pub fn part_two(input: &str) -> Option<usize> {
+    let char_mat = build_matrix(input);
+    let mut energized_tiles_counts = vec![];
+
+    for i in tqdm(0..char_mat.len()) {
+        energized_tiles_counts.push(get_energized_tiles_count(&char_mat, (i, 0), "right"));
+        energized_tiles_counts.push(get_energized_tiles_count(&char_mat, (i, char_mat[0].len() - 1), "left"));
+    }
+
+    for j in tqdm(0..char_mat[0].len()) {
+        energized_tiles_counts.push(get_energized_tiles_count(&char_mat, (0, j), "down"));
+        energized_tiles_counts.push(get_energized_tiles_count(&char_mat, (char_mat.len() - 1, j), "up"));
+    }
+
+    let mut max = None;
+    for c in energized_tiles_counts {
+        if max.is_none() {
+            max = Some(c);
+        } else if max.unwrap() < c {
+            max = Some(c);
+        }
+    }
+
+    max
+}
+
+fn get_energized_tiles_count(char_mat: &Vec<Vec<char>>, start_coords: (usize, usize), start_going_direction: &'static str) -> usize {
+    let mut ray_path = vec![(start_coords, start_going_direction)];
+    update_ray_path(&char_mat, start_coords, start_going_direction, &mut ray_path);
+    // count unique tiles visited by the ray
+    let mut energized_tiles = vec![];
+    for tile in ray_path {
+        let (coords, _) = tile;
+        if !energized_tiles.contains(&coords) {
+            energized_tiles.push(coords);
+        }
+    }
+    energized_tiles.len()
 }
 
 #[cfg(test)]
@@ -178,6 +215,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(51));
     }
 }
