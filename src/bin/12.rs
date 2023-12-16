@@ -1,3 +1,4 @@
+use tqdm::tqdm;
 advent_of_code::solution!(12);
 
 pub fn part_one(input: &str) -> Option<usize> {
@@ -69,6 +70,9 @@ fn validate_sequence(sequence: &Vec<char>, contiguous_groups: &Vec<usize>) -> bo
         } else if *c == '#' {
             counting = true;
             current_group_counter += 1;
+            if current_group_counter > contiguous_groups[current_group_index] {
+                return false;
+            }
         } else {
             if counting {
                 if current_group_index >= contiguous_groups.len() {
@@ -95,8 +99,42 @@ fn validate_sequence(sequence: &Vec<char>, contiguous_groups: &Vec<usize>) -> bo
     }
 }
 
-pub fn part_two(input: &str) -> Option<u32> {
-    None
+pub fn part_two(input: &str) -> Option<usize> {
+    let mut sum = 0;
+    for line in tqdm(input.split("\n")) {
+        if line.len() > 0 {
+            let (mut sequence, mut contiguous_groups) = parse_line(line);
+            // unfold sequences and contiguous groups five times
+            sequence = vec![
+                sequence.clone(),
+                vec!['?'],
+                sequence.clone(),
+                vec!['?'],
+                sequence.clone(),
+                vec!['?'],
+                sequence.clone(),
+                vec!['?'],
+                sequence.clone(),
+            ]
+            .concat();
+            contiguous_groups = vec![
+                contiguous_groups.clone(),
+                contiguous_groups.clone(),
+                contiguous_groups.clone(),
+                contiguous_groups.clone(),
+                contiguous_groups.clone(),
+            ]
+            .concat();
+            let mut valid_combinations = vec![];
+            let damaged_budget: usize = contiguous_groups.iter().sum::<usize>() - sequence.iter().filter(|&&c| c == '#').count();
+            update_valid_combinations(&sequence, &contiguous_groups, &mut valid_combinations, damaged_budget);
+            let combinations_count = valid_combinations.len();
+            // println!("{:?}", valid_combinations);
+            // println!("============== {combinations_count} =================");
+            sum += combinations_count;
+        }
+    }
+    Some(sum)
 }
 
 #[cfg(test)]
@@ -112,6 +150,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(525152));
     }
 }
