@@ -1,18 +1,16 @@
 use tqdm::tqdm;
 advent_of_code::solution!(12);
 
-pub fn part_one(input: &str) -> Option<usize> {
+pub fn part_one(input: &str) -> Option<u128> {
     let mut sum = 0;
     for line in input.split("\n") {
         if line.len() > 0 {
             let (sequence, contiguous_groups) = parse_line(line);
-            let mut valid_combinations = vec![];
+            let mut valid_combinations = 0;
             let damaged_budget: usize = contiguous_groups.iter().sum::<usize>() - sequence.iter().filter(|&&c| c == '#').count();
             update_valid_combinations(&sequence, &contiguous_groups, &mut valid_combinations, damaged_budget);
-            let combinations_count = valid_combinations.len();
-            //println!("{:?}", valid_combinations);
-            //println!("============== {combinations_count} =================");
-            sum += combinations_count;
+            println!("============== {valid_combinations} =================");
+            sum += valid_combinations;
         }
     }
     Some(sum)
@@ -33,7 +31,7 @@ fn parse_line(line: &str) -> (Vec<char>, Vec<usize>) {
 fn update_valid_combinations(
     sequence: &Vec<char>,
     contiguous_groups: &Vec<usize>,
-    valid_combinations: &mut Vec<Vec<char>>,
+    valid_combinations: &mut u128,
     damaged_budget: usize,
 ) {
     if !validate_sequence(sequence, contiguous_groups) {
@@ -43,7 +41,7 @@ fn update_valid_combinations(
     let first_damaged_position = sequence.iter().position(|&r| r == '?');
     if first_damaged_position.is_none() {
         // if there are no damaged positions left, the sequence can be added
-        valid_combinations.push(sequence.clone());
+        *valid_combinations = *valid_combinations + 1;
     } else {
         // Branch with good spring
         let mut new_sequence_good = sequence.clone();
@@ -99,7 +97,7 @@ fn validate_sequence(sequence: &Vec<char>, contiguous_groups: &Vec<usize>) -> bo
     }
 }
 
-pub fn part_two(input: &str) -> Option<usize> {
+pub fn part_two(input: &str) -> Option<u128> {
     let mut sum = 0;
     for line in tqdm(input.split("\n")) {
         if line.len() > 0 {
@@ -125,13 +123,12 @@ pub fn part_two(input: &str) -> Option<usize> {
                 contiguous_groups.clone(),
             ]
             .concat();
-            let mut valid_combinations = vec![];
+            let mut valid_combinations = 0;
             let damaged_budget: usize = contiguous_groups.iter().sum::<usize>() - sequence.iter().filter(|&&c| c == '#').count();
             update_valid_combinations(&sequence, &contiguous_groups, &mut valid_combinations, damaged_budget);
-            let combinations_count = valid_combinations.len();
             // println!("{:?}", valid_combinations);
             // println!("============== {combinations_count} =================");
-            sum += combinations_count;
+            sum += valid_combinations;
         }
     }
     Some(sum)
